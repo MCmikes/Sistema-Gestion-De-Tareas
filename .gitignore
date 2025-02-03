@@ -1,0 +1,6 @@
+# Ignorar carpetas generadas por el compilador
+bin/
+obj/
+
+# Ignorar carpeta de configuración de Visual Studio Code
+.vscode/
