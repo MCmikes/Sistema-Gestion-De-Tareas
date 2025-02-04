@@ -1,129 +1,139 @@
 ﻿namespace SistemaGestorDeTareas;
+using Spectre.Console;
+using System.Collections.Generic;
+using System.Linq;
 
 class Program
 {
-
     public static LinkedList<Tareas> guardarTareas = new LinkedList<Tareas>();
 
     public static void CrearTareas()
     {
-        string ingresarDescripcion = Console.ReadLine();
-
+        string ingresarDescripcion = AnsiConsole.Ask<string>("Ingresa la descripción de la tarea:");
 
         Tareas nuevaTarea = new Tareas(ingresarDescripcion);
         guardarTareas.AddLast(nuevaTarea);
-        
-        Console.WriteLine($"ID: {nuevaTarea.getId()} ");
-        Console.WriteLine($"Descripción: {nuevaTarea.getDescripcion()}");
-        Console.WriteLine($"Estado: {(nuevaTarea.getEstado() ? "Completada" : "Pendiente")}");
 
-
-
+        AnsiConsole.MarkupLine($"[green]Tarea creada con éxito![/]");
+        AnsiConsole.MarkupLine($"[bold]ID:[/] {nuevaTarea.getId()}");
+        AnsiConsole.MarkupLine($"[bold]Descripción:[/] {nuevaTarea.getDescripcion()}");
+        AnsiConsole.MarkupLine($"[bold]Estado:[/] {(nuevaTarea.getEstado() ? "[green]Completada[/]" : "[red]Pendiente[/]")}");
     }
 
     public static void MostrarTareas()
     {
         if (guardarTareas.Count == 0)
         {
-            Console.WriteLine("No hay tareas en la lista para mostrar.");
+            AnsiConsole.MarkupLine("[red]No hay tareas en la lista para mostrar.[/]");
             return;
         }
 
-        
-        Console.WriteLine("******* Lista de Tareas ************");
+        var table = new Table();
+        table.AddColumn(new TableColumn("[bold]ID[/]").Centered());
+        table.AddColumn(new TableColumn("[bold]Descripción[/]").Centered());
+        table.AddColumn(new TableColumn("[bold]Estado[/]").Centered());
 
         foreach (var tarea in guardarTareas)
         {
-            Console.WriteLine($"- ID {tarea.getId()}");
-            Console.WriteLine($"\tDescripcion: {tarea.getDescripcion()}");
-            Console.WriteLine($"\tEstado: {(tarea.getEstado() ? "Completada" : "Pendiente")}");
-            Console.WriteLine();
-
+            table.AddRow(
+                tarea.getId(),
+                tarea.getDescripcion(),
+                tarea.getEstado() ? "[green]Completada[/]" : "[red]Pendiente[/]"
+            );
         }
 
+        AnsiConsole.Write(table);
     }
 
     public static void MarcarTareaCompleta()
     {
-
-        Console.WriteLine("Ingresa el ID de la tarea que deseas marcar como completada: ");
-        string id = Console.ReadLine();
+        string id = AnsiConsole.Ask<string>("Ingresa el ID de la tarea que deseas marcar como completada:");
 
         var tarea = guardarTareas.FirstOrDefault(t => t.getId() == id);
         if (tarea != null)
         {
             tarea.completarTarea();
-            
-            Console.WriteLine($"Tarea '{tarea.getDescripcion()}' marcada como completada.");
+            AnsiConsole.MarkupLine($"[green]Tarea '{tarea.getDescripcion()}' marcada como completada.[/]");
         }
         else
         {
-            
-            Console.WriteLine($"No se encontro la tarea con el {id}");
+            AnsiConsole.MarkupLine($"[red]No se encontró la tarea con el ID {id}.[/]");
         }
-
     }
 
     public static void EliminarTarea()
     {
-        
-        Console.WriteLine("Ingresa el ID de la tarea que deseas eliminar");
-        string id = Console.ReadLine();
+        string id = AnsiConsole.Ask<string>("Ingresa el ID de la tarea que deseas eliminar:");
+
         var tarea = guardarTareas.FirstOrDefault(t => t.getId() == id);
         if (tarea != null)
         {
             guardarTareas.Remove(tarea);
-            Console.WriteLine($"Tarea '{tarea.getDescripcion()}' eliminada con éxito.");
+            AnsiConsole.MarkupLine($"[green]Tarea '{tarea.getDescripcion()}' eliminada con éxito.[/]");
         }
         else
         {
-           
-            Console.WriteLine($"No se encontro la tarea con el {id} para poder eliminar.");
+            AnsiConsole.MarkupLine($"[red]No se encontró la tarea con el ID {id} para poder eliminar.[/]");
         }
-
     }
-
 
     static void Main(string[] args)
     {
-        int optionMenu;
+        AnsiConsole.Markup("[underline red]Hello[/] World!");
 
         do
         {
+            AnsiConsole.Clear();
+            AnsiConsole.Write(
+                new FigletText("Gestor de Tareas")
+                    .Centered()
+                    .Color(Color.Blue)
+            );
 
-            Console.WriteLine("============ SISTEMA GESTIÓN DE TAREAS ==================");
-            Console.WriteLine("*\t\t1. Agregar Tarea.                                  *");
-            Console.WriteLine("*\t\t2. Mostrar Tarea.                                  *");
-            Console.WriteLine("*\t\t3. Marcar Tarea Como Completada.                   *");
-            Console.WriteLine("*\t\t4. Eliminar Tarea.                                 *");
-            Console.WriteLine("*\t\t5. Salir.                                          *");
-            Console.WriteLine("=========================================================");
-            Console.WriteLine("Seleccione una opción: ");
-            optionMenu = Convert.ToInt32(Console.ReadLine());
+            var panel = new Panel("Selecciona una opción:")
+                .Border(BoxBorder.Rounded)
+                .Header("[yellow]Menú Principal[/]")
+                .HeaderAlignment(Justify.Center);
+            AnsiConsole.Write(panel);
 
-            switch (optionMenu)
+            var menu = new SelectionPrompt<string>()
+                .Title("[green]Opciones:[/]")
+                .PageSize(5)
+                .AddChoices(new[] {
+                    "Agregar Tarea",
+                    "Mostrar Tareas",
+                    "Marcar Tarea Como Completada",
+                    "Eliminar Tarea",
+                    "Salir"
+                });
+
+            var opcion = AnsiConsole.Prompt(menu);
+
+            switch (opcion)
             {
-                case 1:
-                    Console.WriteLine("Ingresa una descripción de la tarea");
+                case "Agregar Tarea":
                     CrearTareas();
                     break;
-                case 2:
+                case "Mostrar Tareas":
                     MostrarTareas();
                     break;
-                case 3:
+                case "Marcar Tarea Como Completada":
                     MarcarTareaCompleta();
                     break;
-                case 4:
+                case "Eliminar Tarea":
                     EliminarTarea();
                     break;
-                case 5:
-                    Console.WriteLine("Saliendo del sistema...");
-                    break;
-                default:
-                    Console.WriteLine("Opción no válida. Inténtalo de nuevo.");
+                case "Salir":
+                    AnsiConsole.MarkupLine("[yellow]Saliendo del sistema...[/]");
                     break;
             }
-            Console.WriteLine();
-        } while (optionMenu != 5);
+
+            if (opcion != "Salir")
+            {
+                AnsiConsole.MarkupLine("[yellow]Presiona cualquier tecla para continuar...[/]");
+                Console.ReadKey();
+            }
+
+        } while (AnsiConsole.Confirm("¿Deseas continuar en el sistema?"));
     }
 }
