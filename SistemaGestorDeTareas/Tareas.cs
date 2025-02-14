@@ -1,29 +1,25 @@
 namespace SistemaGestorDeTareas;
 
-class Tareas{
-    private string id;
-    private string description;
-    private bool estado;
+[Serializable]
+public class Tareas
+{
+    public string Id { get; set; }
+    public string Descripcion { get; set; }
+    public bool Estado { get; set; }
 
-    public Tareas(string descripcion){
-        this.id = Guid.NewGuid().ToString();
-        this.description = descripcion;
-        this.estado = false;
-    }
-
-    public string getId() {
-        return id;
-    }
-
-    public string getDescripcion(){
-        return description;
+    public Tareas()
+    {
+        Id = Guid.NewGuid().ToString();
+        Descripcion = string.Empty;
+        Estado = false;
     }
 
-    public bool getEstado() {
-        return estado;
+    public Tareas(string descripcion)
+    {
+        Id = Guid.NewGuid().ToString();
+        Descripcion = descripcion;
+        Estado = false;
     }
-    
-    public void completarTarea(){
-        this.estado = true;
-    }
+
+    public void completarTarea() => Estado = true;
 }

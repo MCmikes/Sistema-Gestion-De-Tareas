@@ -7,11 +7,12 @@ Este es un programa en C# que permite gestionar una lista de tareas. Permite agr
 - Marcar tareas como completadas.
 - Eliminar tareas.
 - Mostrar todas las tareas en formato de tabla.
+- Guarda la información en un archivo tarea.txt para que persista los datos
 
 ## Tecnologías utilizadas
 - C#
 - .NET 9.0
-- Visual Studio Code
+- Visual Studio
 - Spectre.Console
 
 ## Cómo ejecutar el proyecto
